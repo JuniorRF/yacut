@@ -1,6 +1,6 @@
 import pytest
 
-from yacut.models import URLMap
+from app.models import URLMap
 
 py_url = 'https://www.python.org'
 
