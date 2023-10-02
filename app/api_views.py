@@ -3,7 +3,7 @@ import re
 from flask import jsonify, request
 
 from . import app, db
-from .constants import HOST, PATTERN
+from .constants import PATTERN
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 from .views import get_unique_short_id

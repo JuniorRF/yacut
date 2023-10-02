@@ -2,7 +2,7 @@ import re
 import string
 import random
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, flash, redirect, render_template
 
 from . import app, db
 from .constants import HOST, PATTERN
@@ -27,7 +27,7 @@ def index_view():
         if len(custom_id) == 0:
             custom_id = get_unique_short_id()
         if not re.fullmatch(PATTERN, custom_id):
-            flash(f'Неудачный символ в короткой')
+            flash('Неудачный символ в короткой')
             return render_template('form.html', form=form)
         if URLMap.query.filter_by(short=custom_id).first():
             flash(f'Короткая ссылка занята {custom_id}')
