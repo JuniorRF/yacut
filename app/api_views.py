@@ -33,5 +33,5 @@ def create_url():
 def get_short_id(short_id):
     url = URLMap.query.filter_by(short=short_id).first()
     if url is None:
-        return {"message": "Указанный id не найден"}, 400
+        raise InvalidAPIUsage('Указанный id не найден')
     return jsonify({"url": url.original}), 200
