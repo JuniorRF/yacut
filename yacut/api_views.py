@@ -14,14 +14,19 @@ def create_url():
     data = request.get_json()
     if 'url' not in data:
         raise InvalidAPIUsage('В запросе отсутствуют обязательные поля')
-    if len(data['custom_id']) > 16:
-        raise InvalidAPIUsage('Больше 16 символов')
-    if URLMap.query.filter_by(short=data['custom_id']).first():
-        raise InvalidAPIUsage('Уже существует короткая ссылка')
+
     if data.get('custom_id') is None:
         data['custom_id'] = get_unique_short_id()
+
+    if len(data['custom_id']) > 16:
+        raise InvalidAPIUsage('Больше 16 символов')
+
+    if URLMap.query.filter_by(short=data['custom_id']).first():
+        raise InvalidAPIUsage('Уже существует короткая ссылка')
+
     if not re.fullmatch(PATTERN, data['custom_id']):
         raise InvalidAPIUsage('Неудачные символы')
+
     url = URLMap()
     url.from_dict(data)
     db.session.add(url)
