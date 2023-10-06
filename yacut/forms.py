@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField
 from wtforms.validators import DataRequired, Length, URL, Optional
 
+from .constants import MIN_CHAR_LINK, MAX_CHAR_LINK
+
 
 class URLMapForm(FlaskForm):
     original_link = URLField(
@@ -13,6 +15,8 @@ class URLMapForm(FlaskForm):
     )
     custom_id = StringField(
         'Предложить свою',
-        validators=[Length(1, 16, message='Обязательное поле'), Optional()]
+        validators=[Length(
+            MIN_CHAR_LINK, MAX_CHAR_LINK, message='Обязательное поле'
+        ), Optional()]
     )
     submit = SubmitField('Создать')

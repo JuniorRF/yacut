@@ -1,42 +1,26 @@
-import re
+from http import HTTPStatus
 
 from flask import jsonify, request
 
-from . import app, db
-from .constants import PATTERN
+from . import app
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
-from .views import get_unique_short_id
 
 
 @app.route('/api/id/', methods=['POST'])
 def create_url():
     data = request.get_json()
-    if 'url' not in data:
-        raise InvalidAPIUsage('В запросе отсутствуют обязательные поля')
-
-    if data.get('custom_id') is None:
-        data['custom_id'] = get_unique_short_id()
-
-    if len(data['custom_id']) > 16:
-        raise InvalidAPIUsage('Больше 16 символов')
-
-    if URLMap.query.filter_by(short=data['custom_id']).first():
-        raise InvalidAPIUsage('Уже существует короткая ссылка')
-
-    if not re.fullmatch(PATTERN, data['custom_id']):
-        raise InvalidAPIUsage('Неудачные символы')
-
-    url = URLMap()
-    url.from_dict(data)
-    db.session.add(url)
-    db.session.commit()
-    return jsonify({'url': url.to_dict()}), 201
+    if data is None:
+        raise InvalidAPIUsage('Отсутствует тело запроса')
+    elif 'url' not in data:
+        raise InvalidAPIUsage('"url" является обязательным полем!')
+    url = URLMap.save_api(data)
+    return URLMap.to_dict(url), HTTPStatus.CREATED
 
 
-@app.route('/api/id/<string:short_id>', methods=['GET'])
-def get_short_id(short_id):
-    url = URLMap.query.filter_by(short=short_id).first()
+@app.route('/api/id/<string:short_id>/', methods=['GET'])
+def get_short_url(short_id):
+    url = URLMap.get_url(short_id)
     if url is None:
-        raise InvalidAPIUsage('Указанный id не найден')
-    return jsonify({"url": url.original}), 200
+        raise InvalidAPIUsage('Указанный id не найден', HTTPStatus.NOT_FOUND)
+    return jsonify({"url": url.original}), HTTPStatus.OK
